@@ -2,7 +2,7 @@ import requests
 import os
 import re
 
-def extract_path_from_link(link):
+def extract(link):
     base_url = "https://otobanana.com/deep/cast/"
     if link.startswith(base_url):
         path = link[len(base_url):]
@@ -10,7 +10,7 @@ def extract_path_from_link(link):
     else:
         return None
 
-def sanitize_filename(filename):
+def sanitize(filename):
     return re.sub(r'[<>:"/\\|?*\x00-\x1f]', '', filename)
 
 def fetch(cast_path):
@@ -21,7 +21,7 @@ def fetch(cast_path):
         try:
             data = response.json()
             title = data.get('post', {}).get('title', 'default_title')
-            sanitized_title = sanitize_filename(title)
+            sanitized_title = sanitize(title)
             
             audio_url = data.get('audio_url', None)
             if audio_url:
@@ -49,8 +49,10 @@ def fetch(cast_path):
         main()
 
 def main():
+    print("ダウンロードしていただきありがとうございます！！！")
+    print("Github Repositoryにスターお願いします()")
     input_link = input("りんく: ")
-    cast_path = extract_path_from_link(input_link)
+    cast_path = extract(input_link)
 
     if cast_path:
         fetch(cast_path)
