@@ -1,5 +1,5 @@
 # otobanana-downloader
 
-OTOBANANAの音声投稿をダウンロードするpythonファイル
-exe(pyinstaller)版はReleaseに。
+OTOBANANAの音声投稿をダウンロードするpythonファイル\n
+exe(pyinstaller)版はReleaseに。\n
 (GPL v3)
