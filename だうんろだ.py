@@ -49,8 +49,6 @@ def fetch(cast_path):
         main()
 
 def main():
-    print("ダウンロードしていただきありがとうございます！！！")
-    print("Github Repositoryにスターお願いします()")
     input_link = input("りんく: ")
     cast_path = extract(input_link)
 
@@ -60,4 +58,6 @@ def main():
         print("むこうだにょ～ん")
         main()
 
+print("ダウンロードしていただきありがとうございます！！！")
+print("Github Repositoryにスターお願いします()")
 main()
