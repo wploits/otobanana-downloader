@@ -64,4 +64,7 @@ def main():
 
 print("ダウンロードしていただきありがとうございます！！！")
 print("Github Repositoryにスターお願いします()")
+print("\nv1.0.2")
+print("通常版の音声がダウンロードできないバグを修正")
+print("changelog表示機能を追加。\n")
 main()
