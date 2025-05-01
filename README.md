@@ -2,7 +2,7 @@
 
 OTOBANANAの音声投稿をダウンロードするpythonファイル
 
-exe(pyinstaller)版はReleaseに。
+exe(pyinstaller)版とchangelogはReleaseに。
 
 使い方: 
 
