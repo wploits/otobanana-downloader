@@ -3,9 +3,13 @@ import os
 import re
 
 def extract(link):
-    base_url = "https://otobanana.com/deep/cast/"
-    if link.startswith(base_url):
-        path = link[len(base_url):]
+    baseurl1 = "https://otobanana.com/deep/cast/"
+    baseurl2 = "https://otobanana.com/general/cast/"
+    if link.startswith(baseurl1):
+        path = link[len(baseurl1):]
+        return path
+    elif link.startswith(baseurl2):
+        path = link[len(baseurl2):]
         return path
     else:
         return None
