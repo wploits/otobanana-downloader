@@ -1,7 +1,7 @@
 # otobanana-downloader
 
-OTOBANANA（オトバナナ）の音声投稿（キャスト）を保存・ダウンロードするためのPythonツールです。  
-単音声の保存に加え、ユーザーの全投稿（一般・Deep/R18問わず）の一括ダウンロード、マルチスレッド並列処理に対応しています。
+OTOBANANAの音声投稿を保存・ダウンロードするためのPythonツールでs
+いろいろできます
 
 ---
 
@@ -13,6 +13,7 @@ OTOBANANA（オトバナナ）の音声投稿（キャスト）を保存・ダ�
 ## 使い方
 
 ### Python環境で実行する場合
+main.pyをダウンロードしてから
 
 ```bash
 python main.py
@@ -38,16 +39,16 @@ python main.py
 
 ---
 
-## 検索用キーワード
+## タグ(?)
 
 OTOBANANA, オトバナナ, OTOBANANA ダウンローダー, オトバナナ 保存, OTOBANANA 音声保存, OTOBANANA mp3, OTOBANANA ユーザー一括ダウンロード, オトバナナ ボイス 保存, otobanana-downloader, otobanana-saver, audio-downloader
 
 ---
 
-## 免責事項
+## いろいろ
 
 本ツールは個人の学習および私的利用の目的で作成されています。著作権法および利用規約を遵守してご使用ください。
 
 ## ライセンス
 
-[GPL v3 License](LICENSE) (by wploits)
+[MIT License](LICENSE) (by wploits)
