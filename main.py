@@ -20,6 +20,7 @@ HEADERS = {
 
 CONFIG_FILE = "config.json"
 MAX_WORKERS = 5
+VERSION = "2.0.1"
 
 def clear():
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -69,7 +70,7 @@ def sanitieflnm(filename):
 
 def extcss(link):
     link = link.strip()
-    match = re.search(r'/cast/([^/?#]+)', link)
+    match = re.search(r'/casts?/([^/?#]+)', link)
     if match:
         return match.group(1)
     if not link.startswith("http"):
@@ -123,10 +124,11 @@ def dlsgc(cast_id, save_folder):
         if response.status_code == 200:
             try:
                 data = response.json()
-                title = data.get('post', {}).get('title', 'default_title')
-                sanitized_title = sanitieflnm(title)
+                post = data.get('post') or {}
+                title = post.get('title') or f"cast_{cast_id}"
+                sanitized_title = sanitieflnm(title) or f"cast_{cast_id}"
                 
-                audurl = data.get('audurl', None)
+                audurl = data.get('audio_url') or data.get('audurl')
                 if audurl:
                     audio_response = requests.get(audurl, headers=HEADERS, timeout=30)
                     if audio_response.status_code == 200:
@@ -309,7 +311,7 @@ def main():
         print("DLしていただきありがとうございます！！！")
         print("Github Repositoryにスターお願いします()")
         print("==================================")
-        print("v2")
+        print(f"v{VERSION}")
         
         output_dir = os.path.abspath(config.get("output_dir", "."))
         print(f"\n現在の保存先: {output_dir}")
