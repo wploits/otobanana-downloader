@@ -1,6 +1,10 @@
 {
-  "version": "2.0.2",
-  "changelog": "いったんテスト",
+  "version": "2.1.0",
+  "changelog": [
+    "自動アップデート機能を追加",
+    "設定メニューを追加（保存先変更・並列数変更・アプデ通知切替）",
+    "プラグイン機能＆プラグインブラウザーを追加"
+  ],
   "pyrawurl": "https://raw.githubusercontent.com/wploits/otobanana-downloader/main/main.py",
   "exeurl": "https://github.com/wploits/otobanana-downloader/releases/latest/download/otobanana-downloader.exe"
 }
