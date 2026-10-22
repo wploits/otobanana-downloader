@@ -21,7 +21,7 @@ HEADERS = {
 
 CONFIG_FILE = "config.json"
 MAX_WORKERS = 5
-VERSION = "2.0.2"
+VERSION = "2.1.0"
 INFO_URL = "https://raw.githubusercontent.com/wploits/otobanana-downloader/main/info.json"
 PLUGINS_URL = "https://raw.githubusercontent.com/wploits/otobanana-downloader/main/plugins.json"
 
