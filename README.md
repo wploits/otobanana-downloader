@@ -46,6 +46,17 @@ python main.py
 
 ---
 
+## pluginとは
+まぁ、最初otobananaだけ用にしようと思ったんですけど 友達にほかのサービスについて言われたので追加しました
+
+今はerovoice-chのpluginしかありません。
+
+リクエストあるならdiscordまで (一番下に乗ってるよ（笑）)
+
+---
+
+---
+
 ## タグ(?)
 
 OTOBANANA, オトバナナ, OTOBANANA ダウンローダー, オトバナナ 保存, OTOBANANA 音声保存, OTOBANANA mp3, OTOBANANA ユーザー一括ダウンロード, オトバナナ ボイス 保存, otobanana-downloader, otobanana-saver, audio-downloader, erovoice-ch, えろおんちゃんねる, えろおんちゃんねる 音声保存, erovoice-ch 音声保存, えろおんちゃんねる 保存, OTOBANANA ダウンロード, えろおんちゃんねる ダウンロード
@@ -59,3 +70,5 @@ OTOBANANA, オトバナナ, OTOBANANA ダウンローダー, オトバナナ 保
 ## ライセンス
 
 [MIT License](LICENSE) (by wploits)
+
+discord: celoa._
