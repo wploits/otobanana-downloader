@@ -46,7 +46,7 @@ python main.py
 
 ## タグ(?)
 
-OTOBANANA, オトバナナ, OTOBANANA ダウンローダー, オトバナナ 保存, OTOBANANA 音声保存, OTOBANANA mp3, OTOBANANA ユーザー一括ダウンロード, オトバナナ ボイス 保存, otobanana-downloader, otobanana-saver, audio-downloader
+OTOBANANA, オトバナナ, OTOBANANA ダウンローダー, オトバナナ 保存, OTOBANANA 音声保存, OTOBANANA mp3, OTOBANANA ユーザー一括ダウンロード, オトバナナ ボイス 保存, otobanana-downloader, otobanana-saver, audio-downloader, erovoice-ch, えろおんちゃんねる, えろおんちゃんねる 音声保存, erovoice-ch 音声保存, えろおんちゃんねる 保存, OTOBANANA ダウンロード, えろおんちゃんねる ダウンロード
 
 ---
 
