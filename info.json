@@ -1,0 +1,6 @@
+{
+  "version": "2.0.2",
+  "changelog": "いったんテスト",
+  "pyrawurl": "https://raw.githubusercontent.com/wploits/otobanana-downloader/main/main.py",
+  "exeurl": "https://github.com/wploits/otobanana-downloader/releases/latest/download/otobanana-downloader.exe"
+}
