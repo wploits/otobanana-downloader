@@ -4,13 +4,15 @@
     "name": "erovoice-chダウンローダー",
     "version": "1.2.0",
     "desc": "erovoice-chから単一＆ユーザー全音声を保存するよ (ffmpegがあればMP3自動変換)",
-    "url": "https://raw.githubusercontent.com/wploits/otobanana-downloader/main/plugins_repo/erovoice.py"
+    "url": "https://raw.githubusercontent.com/wploits/otobanana-downloader/main/plugins_repo/erovoice.py",
+    "sha256": "b94bc8d8b271a8a8fac763c0328c02397e04b7bdeb49d726e9ebbeb8a68c06d0"
   },
   {
     "id": "otobanana_featured",
     "name": "otobanana-featured",
     "version": "1.0.1",
     "desc": "OTOBANANAの新着・人気・カテゴリ別音声をCLIで見てそのままDL＆再生できるよ",
-    "url": "https://raw.githubusercontent.com/wploits/otobanana-downloader/main/plugins_repo/otobanana_featured.py"
+    "url": "https://raw.githubusercontent.com/wploits/otobanana-downloader/main/plugins_repo/otobanana_featured.py",
+    "sha256": "0c76b6ac4878d5ede21619eaae004d57a2d7e8f383d36daf75a497adad162d7c"
   }
 ]
