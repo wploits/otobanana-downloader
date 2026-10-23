@@ -2,7 +2,7 @@
   {
     "id": "erovoice",
     "name": "erovoice-chダウンローダー",
-    "version": "1.0.1",
+    "version": "1.2.0",
     "desc": "erovoice-chから単一＆ユーザー全音声を保存するよ (ffmpegがあればMP3自動変換)",
     "url": "https://raw.githubusercontent.com/wploits/otobanana-downloader/main/plugins_repo/erovoice.py"
   },
