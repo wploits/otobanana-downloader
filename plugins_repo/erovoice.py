@@ -6,14 +6,14 @@ import subprocess
 from concurrent.futures import ThreadPoolExecutor
 
 PLUGIN_NAME = "erovoice-chダウンローダー"
-PLUGIN_VERSION = "1.0.1"
+PLUGIN_VERSION = "1.2.0"
 PLUGIN_DESC = "erovoice-chから単一＆ユーザー全音声を保存するよ (ffmpegがあればMP3自動変換)"
 
 UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36"
 
 def extid(link):
     link = link.strip()
-    m = re.search(r'/(?:ero-voice|ero-asmr)/(\d+)', link)
+    m = re.search(r'/(?:ero-voice|ero-asmr|moe-asmr)/(\d+)', link)
     if m:
         return m.group(1)
     if link.isdigit():
@@ -122,7 +122,7 @@ def gettitle(cast_id, req_mod, sanitie_fn):
         "User-Agent": UA,
         "Referer": f"https://erovoice-ch.com/ero-asmr/{cast_id}.html"
     }
-    for prefix in ["ero-voice", "ero-asmr"]:
+    for prefix in ["ero-voice", "ero-asmr", "moe-asmr"]:
         try:
             url = f"https://erovoice-ch.com/{prefix}/{cast_id}.html"
             res = req_mod.get(url, headers=headers, timeout=10)
@@ -154,7 +154,7 @@ def getuseritems(user_slug, req_mod, sanitie_fn):
         m_uname = re.search(r"<title>(.*?)さんのプロフィールページ", txt)
         user_name = sanitie_fn(m_uname.group(1)) if m_uname else f"user_{user_slug}"
 
-        cards = re.findall(r'<a[^>]+href=[\'"]https://erovoice-ch\.com/(?:ero-voice|ero-asmr)/(\d+)\.html[\'"][^>]*>([\s\S]*?)</a>', txt)
+        cards = re.findall(r'<a[^>]+href=[\'"]https://erovoice-ch\.com/(?:ero-voice|ero-asmr|moe-asmr)/(\d+)\.html[\'"][^>]*>([\s\S]*?)</a>', txt)
         items = []
         seen = set()
         for vid, inner in cards:
