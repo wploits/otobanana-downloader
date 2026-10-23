@@ -7,7 +7,7 @@ import subprocess
 from concurrent.futures import ThreadPoolExecutor
 
 PLUGIN_NAME = "otobanana-featured"
-PLUGIN_VERSION = "1.0.0"
+PLUGIN_VERSION = "1.0.1"
 PLUGIN_DESC = "OTOBANANAの新着・人気・カテゴリ別音声をCLIで見てそのままDL＆再生できるよ"
 
 def sfprt(txt):
@@ -253,28 +253,40 @@ def brwsusr(user_id, user_name, init_adult, output_dir, max_workers, req_mod, he
     is_adult = init_adult
     b_str = "true" if is_adult else "false"
     cur_url = f"https://api.v2.otobanana.com/api/users/{user_id}/casts?is_adult={b_str}"
+    page_urls = {1: cur_url}
+    page_cache = {}
     page_num = 1
-    history = []
 
     while True:
         mode_str = "R18" if is_adult else "一般"
-        clear_fn()
-        sfprt("====================================")
-        sfprt(f"ユーザー: {user_name} [{mode_str}] (ページ {page_num})")
-        sfprt("====================================")
-        sfprt("読み込みちゅう...")
-
-        try:
-            r = req_mod.get(cur_url, headers=headers, timeout=10)
-            if r.status_code != 200:
-                sfprt(f"取得失敗 ({r.status_code})")
+        if page_num in page_cache:
+            data = page_cache[page_num]
+        else:
+            clear_fn()
+            sfprt("====================================")
+            sfprt(f"ユーザー: {user_name} [{mode_str}] (ページ {page_num})")
+            sfprt("====================================")
+            sfprt("読み込みちゅう...")
+            fetch_url = page_urls.get(page_num)
+            if not fetch_url:
+                sfprt("URLが見つからない")
                 input("\nEnterキーで戻ります...")
                 return
-            data = r.json()
-        except Exception as e:
-            sfprt(f"えらー: {e}")
-            input("\nEnterキーで戻ります...")
-            return
+            try:
+                r = req_mod.get(fetch_url, headers=headers, timeout=10)
+                if r.status_code != 200:
+                    sfprt(f"取得失敗 ({r.status_code})")
+                    input("\nEnterキーで戻ります...")
+                    return
+                data = r.json()
+                page_cache[page_num] = data
+                nxt = data.get("next_page_url")
+                if nxt:
+                    page_urls[page_num + 1] = nxt
+            except Exception as e:
+                sfprt(f"えらー: {e}")
+                input("\nEnterキーで戻ります...")
+                return
 
         items = data.get("data", [])
         next_url = data.get("next_page_url")
@@ -302,10 +314,11 @@ def brwsusr(user_id, user_name, init_adult, output_dir, max_workers, req_mod, he
             sfprt(f"番号 (1-{len(items)}): ダウンロード＆再生")
         sfprt("a: このユーザーの音声を全部一括DL")
         sfprt("t: 一般 / R18 の表示切り替え")
-        if next_url:
+        if next_url or (page_num + 1) in page_urls:
             sfprt("n: 次のページ (next page)")
-        if prev_url or history:
+        if page_num > 1:
             sfprt("p: 前のページ (prev page)")
+        sfprt("p[数字] (例: p4): 指定ページへジャンプ")
         sfprt("b: 元のリストに戻る")
         sfprt("------------------------------------")
 
@@ -318,46 +331,92 @@ def brwsusr(user_id, user_name, init_adult, output_dir, max_workers, req_mod, he
             is_adult = not is_adult
             b_str = "true" if is_adult else "false"
             cur_url = f"https://api.v2.otobanana.com/api/users/{user_id}/casts?is_adult={b_str}"
+            page_urls = {1: cur_url}
+            page_cache = {}
             page_num = 1
-            history = []
-        elif c.lower() == "n" and next_url:
-            history.append(cur_url)
-            cur_url = next_url
-            page_num += 1
-        elif c.lower() == "p" and (history or prev_url):
-            if history:
-                cur_url = history.pop()
+        elif c.lower() == "n":
+            if next_url or (page_num + 1) in page_urls:
+                page_num += 1
+        elif c.lower() == "p":
+            if page_num > 1:
+                page_num -= 1
+        elif re.match(r"^p\d+$", c.lower()):
+            tp = int(c.lower()[1:])
+            if tp < 1:
+                tp = 1
+            if tp == page_num:
+                pass
+            elif tp < page_num:
+                page_num = tp
             else:
-                cur_url = prev_url
-            page_num = max(1, page_num - 1)
+                while page_num < tp:
+                    if page_num not in page_cache:
+                        curl = page_urls.get(page_num)
+                        if not curl:
+                            break
+                        try:
+                            r = req_mod.get(curl, headers=headers, timeout=10)
+                            if r.status_code != 200:
+                                break
+                            d = r.json()
+                            page_cache[page_num] = d
+                            nxt = d.get("next_page_url")
+                            if nxt:
+                                page_urls[page_num + 1] = nxt
+                        except Exception:
+                            break
+                    d = page_cache.get(page_num, {})
+                    nxt = d.get("next_page_url")
+                    if not nxt:
+                        sfprt(f"\nこれ以上ページがないよ (最大ページ: {page_num})")
+                        time.sleep(1)
+                        break
+                    page_num += 1
+                    page_urls[page_num] = nxt
+                    clear_fn()
+                    sfprt("====================================")
+                    sfprt(f"ユーザー: {user_name} [{mode_str}]")
+                    sfprt(f"ページ {tp} へ移動ちゅう... ({page_num}/{tp})")
+                    sfprt("====================================")
         elif c.isdigit():
             val = int(c)
             if 1 <= val <= len(items):
                 dlandply(items[val - 1], output_dir, req_mod, headers, sanitie_fn)
 
 def brwscast(is_adult, mode_label, cat_name, init_url, output_dir, max_workers, req_mod, headers, clear_fn, sanitie_fn):
-    cur_url = init_url
+    page_urls = {1: init_url}
+    page_cache = {}
     page_num = 1
-    history = []
 
     while True:
-        clear_fn()
-        sfprt("====================================")
-        sfprt(f"[{mode_label}] {cat_name} (ページ {page_num})")
-        sfprt("====================================")
-        sfprt("読み込みちゅう...")
-
-        try:
-            r = req_mod.get(cur_url, headers=headers, timeout=10)
-            if r.status_code != 200:
-                sfprt(f"取得失敗 ({r.status_code})")
+        if page_num in page_cache:
+            data = page_cache[page_num]
+        else:
+            clear_fn()
+            sfprt("====================================")
+            sfprt(f"[{mode_label}] {cat_name} (ページ {page_num})")
+            sfprt("====================================")
+            sfprt("読み込みちゅう...")
+            fetch_url = page_urls.get(page_num)
+            if not fetch_url:
+                sfprt("URLが見つからない")
                 input("\nEnterキーで戻ります...")
                 return
-            data = r.json()
-        except Exception as e:
-            sfprt(f"えらー: {e}")
-            input("\nEnterキーで戻ります...")
-            return
+            try:
+                r = req_mod.get(fetch_url, headers=headers, timeout=10)
+                if r.status_code != 200:
+                    sfprt(f"取得失敗 ({r.status_code})")
+                    input("\nEnterキーで戻ります...")
+                    return
+                data = r.json()
+                page_cache[page_num] = data
+                nxt = data.get("next_page_url")
+                if nxt:
+                    page_urls[page_num + 1] = nxt
+            except Exception as e:
+                sfprt(f"えらー: {e}")
+                input("\nEnterキーで戻ります...")
+                return
 
         items = data.get("data", [])
         next_url = data.get("next_page_url")
@@ -386,26 +445,61 @@ def brwscast(is_adult, mode_label, cat_name, init_url, output_dir, max_workers, 
         if items:
             sfprt(f"番号 (1-{len(items)}): ダウンロード＆再生")
             sfprt(f"番号+u (例: 1u): そのユーザーの音声一覧・一括DL")
-        if next_url:
+        if next_url or (page_num + 1) in page_urls:
             sfprt("n: 次のページ (next page)")
-        if prev_url or history:
+        if page_num > 1:
             sfprt("p: 前のページ (prev page)")
+        sfprt("p[数字] (例: p4): 指定ページへジャンプ")
         sfprt("b: カテゴリ選択に戻る")
         sfprt("------------------------------------")
 
         c = input("選択して: ").strip()
         if not c or c.lower() == "b":
             break
-        elif c.lower() == "n" and next_url:
-            history.append(cur_url)
-            cur_url = next_url
-            page_num += 1
-        elif c.lower() == "p" and (history or prev_url):
-            if history:
-                cur_url = history.pop()
+        elif c.lower() == "n":
+            if next_url or (page_num + 1) in page_urls:
+                page_num += 1
+        elif c.lower() == "p":
+            if page_num > 1:
+                page_num -= 1
+        elif re.match(r"^p\d+$", c.lower()):
+            tp = int(c.lower()[1:])
+            if tp < 1:
+                tp = 1
+            if tp == page_num:
+                pass
+            elif tp < page_num:
+                page_num = tp
             else:
-                cur_url = prev_url
-            page_num = max(1, page_num - 1)
+                while page_num < tp:
+                    if page_num not in page_cache:
+                        curl = page_urls.get(page_num)
+                        if not curl:
+                            break
+                        try:
+                            r = req_mod.get(curl, headers=headers, timeout=10)
+                            if r.status_code != 200:
+                                break
+                            d = r.json()
+                            page_cache[page_num] = d
+                            nxt = d.get("next_page_url")
+                            if nxt:
+                                page_urls[page_num + 1] = nxt
+                        except Exception:
+                            break
+                    d = page_cache.get(page_num, {})
+                    nxt = d.get("next_page_url")
+                    if not nxt:
+                        sfprt(f"\nこれ以上ページがないよ (最大ページ: {page_num})")
+                        time.sleep(1)
+                        break
+                    page_num += 1
+                    page_urls[page_num] = nxt
+                    clear_fn()
+                    sfprt("====================================")
+                    sfprt(f"[{mode_label}] {cat_name}")
+                    sfprt(f"ページ {tp} へ移動ちゅう... ({page_num}/{tp})")
+                    sfprt("====================================")
         elif c.isdigit():
             val = int(c)
             if 1 <= val <= len(items):
