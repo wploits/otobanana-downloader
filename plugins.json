@@ -14,5 +14,13 @@
     "desc": "OTOBANANAの新着・人気・カテゴリ別音声をCLIで見てそのままDL＆再生できるよ",
     "url": "https://raw.githubusercontent.com/wploits/otobanana-downloader/main/plugins_repo/otobanana_featured.py",
     "sha256": "0c76b6ac4878d5ede21619eaae004d57a2d7e8f383d36daf75a497adad162d7c"
+  },
+  {
+    "id": "otobanana_search",
+    "name": "otobanana-search",
+    "version": "1.0.0",
+    "desc": "OTOBANANAの音声をキーワード・カテゴリ・性別・並び順で検索してDL＆再生できるよ",
+    "url": "https://raw.githubusercontent.com/wploits/otobanana-downloader/main/plugins_repo/otobanana_search.py",
+    "sha256": "670f5d8e00aa83cf75401f8986aff6f50eca382b245cf32c44b0162de0e2a46a"
   }
 ]
