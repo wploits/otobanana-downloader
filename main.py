@@ -3,6 +3,7 @@ import re
 import sys
 import time
 import json
+import hashlib
 import threading
 import subprocess
 import importlib.util
@@ -21,9 +22,10 @@ HEADERS = {
 
 CONFIG_FILE = "config.json"
 MAX_WORKERS = 5
-VERSION = "2.1.1"
+VERSION = "2.2.0"
 INFO_URL = "https://raw.githubusercontent.com/wploits/otobanana-downloader/main/info.json"
 PLUGINS_URL = "https://raw.githubusercontent.com/wploits/otobanana-downloader/main/plugins.json"
+OFFICIAL_REPO_PREFIX = "https://raw.githubusercontent.com/wploits/otobanana-downloader/"
 
 BASE_DIR = os.path.dirname(sys.executable) if getattr(sys, 'frozen', False) else os.path.dirname(os.path.abspath(__file__))
 PLUGINS_DIR = os.path.join(BASE_DIR, "plugins")
@@ -154,6 +156,16 @@ def chkupd():
             print(f"ダウンロード失敗... ステータスコード: {r.status_code}")
             time.sleep(2)
             return
+
+        exp_hash = info.get("exesha256") if is_exe else info.get("pysha256")
+        if not exp_hash:
+            exp_hash = info.get("sha256")
+        if exp_hash:
+            calc_hash = hashlib.sha256(r.content).hexdigest()
+            if calc_hash.lower() != exp_hash.lower():
+                print("ハッシュ不一致！改ざんの危険があるため更新を中断したよ")
+                time.sleep(3)
+                return
 
         if is_exe:
             cur_exe = sys.executable
@@ -583,48 +595,38 @@ def plgnbrws():
 
         print("------------------------------------")
         print("番号: インストール / 再インストール")
-        print("u: URLから手動ダウンロード")
         print("b: 戻る")
         print("------------------------------------")
         
         c = input("選択して: ").strip()
         if c.lower() == "b" or not c:
             break
-        elif c.lower() == "u":
-            u_link = input("プラグインの raw URL: ").strip()
-            if u_link:
-                try:
-                    res = requests.get(u_link, headers=HEADERS, timeout=15)
-                    if res.status_code == 200:
-                        fn = u_link.split("/")[-1].split("?")[0]
-                        if not fn.endswith(".py"):
-                            fn += ".py"
-                        fn = sanitieflnm(fn)
-                        out_p = os.path.join(PLUGINS_DIR, fn)
-                        with open(out_p, "wb") as f:
-                            f.write(res.content)
-                        print(f"\nインストール成功: {fn}")
-                        installed_files = [f.lower() for f in os.listdir(PLUGINS_DIR)]
-                    else:
-                        print(f"ダウンロード失敗 ({res.status_code})")
-                except Exception as ex:
-                    print(f"エラー: {ex}")
-            input("\nEnterキーで続行...")
         elif c.isdigit():
             val = int(c)
             if 1 <= val <= len(plist):
                 target = plist[val - 1]
-                t_url = target.get("url")
+                t_url = target.get("url", "")
                 t_id = target.get("id", f"plugin_{val}")
+                if not re.match(r"^[a-zA-Z0-9_-]+$", str(t_id)):
+                    print("不正なプラグインID")
+                    input("\nEnterキーで続行...")
+                    continue
                 t_fn = f"{t_id}.py"
-                if not t_url:
-                    print("URLが見つからない")
+                if not t_url or not t_url.startswith(OFFICIAL_REPO_PREFIX):
+                    print("公式リポジトリ以外のプラグインはインストールできません")
                     input("\nEnterキーで続行...")
                     continue
                 print(f"\n{target.get('name', t_id)} をダウンロードちゅう...")
                 try:
                     res = requests.get(t_url, headers=HEADERS, timeout=15)
                     if res.status_code == 200:
+                        exp_hash = target.get("sha256")
+                        if exp_hash:
+                            calc_hash = hashlib.sha256(res.content).hexdigest()
+                            if calc_hash.lower() != exp_hash.lower():
+                                print("ハッシュ不一致！改ざんの危険があるため中止したよ")
+                                input("\nEnterキーで続行...")
+                                continue
                         os.makedirs(PLUGINS_DIR, exist_ok=True)
                         out_p = os.path.join(PLUGINS_DIR, t_fn)
                         with open(out_p, "wb") as f:
@@ -688,8 +690,10 @@ def chkplgupd(target):
     if ans == "n":
         return target["mod"]
 
-    dl_url = rmt.get("url")
-    if not dl_url:
+    dl_url = rmt.get("url", "")
+    if not dl_url or not dl_url.startswith(OFFICIAL_REPO_PREFIX):
+        print("公式リポジトリ以外のプラグインは更新できません")
+        time.sleep(2)
         return target["mod"]
 
     print("\nプラグインを更新ちゅう...")
@@ -697,6 +701,13 @@ def chkplgupd(target):
         sep = "&" if "?" in dl_url else "?"
         res = requests.get(f"{dl_url}{sep}t={int(time.time())}", headers=HEADERS, timeout=15)
         if res.status_code == 200:
+            exp_hash = rmt.get("sha256")
+            if exp_hash:
+                calc_hash = hashlib.sha256(res.content).hexdigest()
+                if calc_hash.lower() != exp_hash.lower():
+                    print("ハッシュ不一致！改ざんの危険があるため更新を中止したよ")
+                    time.sleep(2)
+                    return target["mod"]
             with open(target["path"], "wb") as f:
                 f.write(res.content)
             mod_id = f"plg_{os.path.splitext(target['file'])[0]}"
