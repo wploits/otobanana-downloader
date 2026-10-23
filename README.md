@@ -1,3 +1,4 @@
+![Visitors](https://visitor-badge.laobi.icu/badge?page_id=wploits.otobanana-downloader&left_text=visitors)
 # otobanana-downloader
 
 OTOBANANAの音声投稿を保存・ダウンロードするためのPythonツールでs
