@@ -1,8 +1,11 @@
 {
-  "version": "2.1.1",
+  "version": "2.2.0",
   "changelog": [
-    "プラグイン起動時の自動アップデート確認機能を追加"
+    "セキュリティ強化",
+    "任意のURLからの直接ダウンロード機能を廃止"
   ],
+  "pysha256": "3efeddb1b855962801b21f97413ca55b893ea588456c0e707f82ac44f84fd23d",
+  "exesha256": "d213777422d25c9a268c6cba12de1602c631371edde6aa6c7bec9a1a40e762fa",
   "pyrawurl": "https://raw.githubusercontent.com/wploits/otobanana-downloader/main/main.py",
   "exeurl": "https://github.com/wploits/otobanana-downloader/releases/latest/download/otobanana-downloader.exe"
 }
