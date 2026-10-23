@@ -21,7 +21,7 @@ HEADERS = {
 
 CONFIG_FILE = "config.json"
 MAX_WORKERS = 5
-VERSION = "2.1.0"
+VERSION = "2.1.1"
 INFO_URL = "https://raw.githubusercontent.com/wploits/otobanana-downloader/main/info.json"
 PLUGINS_URL = "https://raw.githubusercontent.com/wploits/otobanana-downloader/main/plugins.json"
 
@@ -637,6 +637,84 @@ def plgnbrws():
                     print(f"エラー: {ex}")
                 input("\nEnterキーで続行...")
 
+def chkplgupd(target):
+    try:
+        r = requests.get(f"{PLUGINS_URL}?t={int(time.time())}", headers=HEADERS, timeout=5)
+        if r.status_code != 200:
+            return target["mod"]
+        plist = r.json()
+    except Exception:
+        return target["mod"]
+
+    if not isinstance(plist, list):
+        return target["mod"]
+
+    pid = os.path.splitext(target["file"])[0].lower()
+    rmt = None
+    for p in plist:
+        if str(p.get("id", "")).lower() == pid or p.get("name") == target["name"]:
+            rmt = p
+            break
+
+    if not rmt:
+        return target["mod"]
+
+    rmt_ver = rmt.get("version")
+    cur_ver = target.get("ver")
+    if not rmt_ver:
+        return target["mod"]
+
+    has_upd = False
+    if not cur_ver:
+        has_upd = True
+    else:
+        try:
+            has_upd = prsvr(rmt_ver) > prsvr(cur_ver)
+        except Exception:
+            has_upd = str(rmt_ver) != str(cur_ver)
+
+    if not has_upd:
+        return target["mod"]
+
+    clear()
+    print("====================================")
+    print(f"[{target['name']}] 新しいバージョンがあるよ！ (v{cur_ver} -> v{rmt_ver})")
+    print("====================================")
+    while True:
+        ans = input("アップデートありますよ！アップデートしますか？(y/n): ").strip().lower()
+        if ans in ["y", "n"]:
+            break
+
+    if ans == "n":
+        return target["mod"]
+
+    dl_url = rmt.get("url")
+    if not dl_url:
+        return target["mod"]
+
+    print("\nプラグインを更新ちゅう...")
+    try:
+        sep = "&" if "?" in dl_url else "?"
+        res = requests.get(f"{dl_url}{sep}t={int(time.time())}", headers=HEADERS, timeout=15)
+        if res.status_code == 200:
+            with open(target["path"], "wb") as f:
+                f.write(res.content)
+            mod_id = f"plg_{os.path.splitext(target['file'])[0]}"
+            spec = importlib.util.spec_from_file_location(mod_id, target["path"])
+            mod = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(mod)
+            print("更新せいこう！")
+            time.sleep(1)
+            return mod
+        else:
+            print(f"更新失敗 ({res.status_code})")
+            time.sleep(1)
+    except Exception as e:
+        print(f"更新エラー: {e}")
+        time.sleep(1)
+
+    return target["mod"]
+
 def plgnmnu():
     global config
     while True:
@@ -688,7 +766,7 @@ def plgnmnu():
             val = int(ans)
             if 1 <= val <= len(plugins):
                 target = plugins[val - 1]
-                mod = target["mod"]
+                mod = chkplgupd(target)
                 clear()
                 ctx = {
                     "output_dir": os.path.abspath(config.get("output_dir", ".")),
